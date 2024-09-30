@@ -36,7 +36,7 @@ then
 	rediscnf='/etc/redis.conf'
 fi
 
-if echo $os|grep -E '^Debian' >/dev/null
+if echo $os|grep -E '^Ubuntu' >/dev/null
 then
 	mycnf='/etc/mysql/conf.d/z9_bitrix.cnf'
 	phpini='/etc/php/8.2/fpm/conf.d/z9_bitrix.ini'
@@ -549,7 +549,7 @@ then
 fi
 
 
-if echo $os|grep -Eo 'Debian' >/dev/null
+if echo $os|grep -Eo 'Ubuntu' >/dev/null
 then
 	apt update
 	apt-get install -y software-properties-common apt-transport-https debconf-utils lsb-release gnupg gnupg2 debian-archive-keyring pwgen make build-essential wget curl

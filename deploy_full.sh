@@ -26,16 +26,6 @@ exec 2> ${LOG_PIPE}
 
 os=`set -o pipefail && { cat /etc/centos-release || { source /etc/os-release && echo $PRETTY_NAME; } ;}`
 
-if echo $os|grep -E '^CentOS.* [7]{1}\.' >/dev/null
-then
-	nginxcnf='/etc/nginx/conf.d/default.conf'
-	mycnf='/etc/my.cnf.d/z9_bitrix.cnf'
-	phpini='/etc/php.d/z9_bitrix.ini'
-	phpfpmcnf='/etc/php-fpm.d/www.conf'
-	croncnf='/etc/cron.d/bitrixagent'
-	rediscnf='/etc/redis.conf'
-fi
-
 if echo $os|grep -E '^Ubuntu' >/dev/null
 then
 	mycnf='/etc/mysql/conf.d/z9_bitrix.cnf'
@@ -352,12 +342,9 @@ rediscnf() {
 		maxmemory 459mb
 		maxmemory-policy allkeys-lru
 	EOF
-	if echo $os|grep -E '^CentOS[a-zA-Z ]*[7]{1}\.' > /dev/null
-  then
-		echo unixsocket /tmp/redis.sock
-	else
+	
 		echo unixsocket /var/run/redis/redis.sock
-	fi
+
 
 }
 
@@ -461,93 +448,6 @@ systemctl enable disable-thp
 
 
 mkdir -p /var/www/html
-
-if echo $os|grep -E '^CentOS[a-zA-Z ]*[7]{1}\.' > /dev/null
-then
-
-	release=7
-	yum install -y http://rpms.remirepo.net/enterprise/remi-release-${release}.rpm  yum-utils fail2ban
-	yum-config-manager --enable remi-php82
-	cat <<-\EOF >/etc/yum.repos.d/mariadb.repo
-		[mariadb]
-		name = MariaDB
-		baseurl = https://mirror.docker.ru/mariadb/yum/10.11/centos/$releasever/$basearch
-		module_hotfixes = 1
-		gpgkey = https://mirror.docker.ru/mariadb/yum/RPM-GPG-KEY-MariaDB
-		gpgcheck = 1
-	EOF
-	cat <<-\EOF >/etc/yum.repos.d/nginx.repo
-		[nginx]
-		name=nginx repo
-		baseurl=http://nginx.org/packages/centos/$releasever/$basearch/
-		gpgcheck=0
-		enabled=1
-	EOF
-	cat <<-\EOF >/etc/yum.repos.d/bitrix.repo
-	[bitrix]
-		name=$OS $releasever - $basearch
-		failovermethod=priority
-		baseurl=http://repos.1c-bitrix.ru/yum/el/$releasever/$basearch
-		enabled=1
-		gpgcheck=1
-		gpgkey=http://repos.1c-bitrix.ru/yum/RPM-GPG-KEY-BitrixEnv
-	EOF
-	yum clean all
-	yum install -y wget https://rpm.nodesource.com/pub_16.x/nodistro/repo/nodesource-release-nodistro-1.noarch.rpm
-	yum install -y nodejs --setopt=nodesource-nodejs.module_hotfixes=1
-
-	yum install -y httpd nginx MariaDB-server MariaDB-client php php-fpm php-opcache php-curl php-mbstring php-xml php-json php-mysqli php-gd php-zip php-ldap curl bzip2 catdoc bx-push-server redis sysfsutils
-	unset http_proxy
-	echo 'vm.overcommit_memory = 1' >> /etc/sysctl.conf
-	echo 'net.core.somaxconn = 65535' >> /etc/sysctl.conf
-	sysctl vm.overcommit_memory=1
-	sysctl -w net.core.somaxconn=65535
-	disableTHP
-
-	envver=$(wget -qO- 'https://repos.1c-bitrix.ru/yum/SRPMS/' | grep -Eo 'bitrix-env-[0-9]\.[^src\.rpm]*'|sort -n|tail -n 1 | sed 's/bitrix-env-//;s/-/./')
-	ip=$(wget -qO- "https://ipinfo.io/ip")
-	echo "WS_HOST=127.0.0.1" >> /etc/sysconfig/push-server-multi
-	/etc/init.d/push-server-multi reset
-	echo -e '[Service]\nGroup=apache' > /etc/systemd/system/redis.service.d/custom.conf
-	cryptokey=$(grep 'SECURITY_KEY' /etc/sysconfig/push-server-multi |cut -d= -f2)
-	systemctl daemon-reload
-	usermod -g apache redis
-
-	mkdir /var/run/mariadb
-	chown mysql /var/run/mariadb
-	echo 'd /var/run/mariadb 0775 mysql -' > /etc/tmpfiles.d/mariadb.conf
-	[ $release -eq 7 ] && (firewall-cmd --zone=public --add-port=80/tcp --add-port=443/tcp --add-port=21/tcp --add-port=8893/tcp --permanent && firewall-cmd --reload) || (iptables -I INPUT 1 -p tcp -m multiport --dports 21,80,443 -j ACCEPT && iptables-save > /etc/sysconfig/iptables)
-	cd /var/www/html
-	# wget -qO- http://rep.fvds.ru/cms/bitrixstable.tgz|tar -zxp
-	wget -qO- https://raw.githubusercontent.com/YogSottot/bitrix-gt/master/bitrixstable.tgz|tar -zxp
-	mv -f ./nginx/* /etc/nginx/
-	rm -rf /etc/httpd/{conf,conf.d,conf.modules.d}
-	mv -f ./httpd/* /etc/httpd/
-	rm -rf ./{httpd,nginx}
-	mkdir -p bitrix/php_interface
-	dbconn > bitrix/php_interface/dbconn.php
-	settings > bitrix/.settings.php
-	rediscnf > ${rediscnf}
-	sed -i 's/general/crm/' /etc/httpd/bx/conf/00-environment.conf
-	echo "env[BITRIX_VA_VER]=${envver}" > /etc/php-fpm.d/bx
-	phpsetup >> ${phpini}
-	fpmsetup 'apache' > ${phpfpmcnf}
-	cronagent 'apache' > ${croncnf}
-	mysqlcnf > ${mycnf}
-	ln -s /etc/nginx/bx/site_avaliable/push.conf /etc/nginx/bx/site_enabled/
-	chown -R apache:apache /var/www/html
-	chmod 771 /var/www/html
-
-
-	echo "env[BITRIX_VA_VER]=${envver}" >> ${phpfpmcnf}
-	sed -i "/BITRIX_VA_VER/d;\$a SetEnv BITRIX_VA_VER ${envver}" /etc/httpd/bx/conf/00-environment.conf
-	chmod 644 ${mycnf} ${phpini} ${phpfpmcnf} ${croncnf} ${nginxcnf} ${rediscnf}
-
-	systemctl enable redis php-fpm nginx httpd push-server mariadb
-	systemctl restart redis crond httpd nginx php-fpm mysql push-server
-	mysql -e "create database bitrix;create user bitrix@localhost;grant all on bitrix.* to bitrix@localhost;set password for bitrix@localhost = PASSWORD('${mypwddb}')"
-fi
-
 
 if echo $os|grep -Eo 'Ubuntu' >/dev/null
 then

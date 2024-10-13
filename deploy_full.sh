@@ -474,7 +474,7 @@ then
 #	echo "deb https://ftp.mpi-inf.mpg.de/mirrors/linux/mirror/deb.sury.org/repositories/php ${release} main" > /etc/apt/sources.list.d/php8.2.list
 	add-apt-repository ppa:ondrej/php	
  	apt update
-	apt install -y php8.2-opcache php8.2-mysqli php8.2-fpm php8.2-gd php8.2-curl php8.2-xml php8.2-mbstring php8.2-xml php8.2-zip \
+	apt install -y php8.2-opcache php8.2-mysqli php8.2-fpm php8.2-gd php8.2-curl php8.2-xml php8.2-mbstring php8.2-xml php8.2-zip php8.2-ldap \
 		mariadb-server mysql-common mariadb-client \
 		nginx catdoc xpdf poppler-utils exim4 exim4-config apache2 libapache2-mod-rpaf \
 		nodejs npm redis sysfsutils nftables net-tools vim

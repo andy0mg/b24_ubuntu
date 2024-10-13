@@ -477,7 +477,7 @@ then
 	apt install -y php8.2-opcache php8.2-mysqli php8.2-fpm php8.2-gd php8.2-curl php8.2-xml php8.2-mbstring \
 		mariadb-server mysql-common mariadb-client \
 		nginx catdoc xpdf poppler-utils exim4 exim4-config apache2 libapache2-mod-rpaf \
-		nodejs npm redis sysfsutils nftables
+		nodejs npm redis sysfsutils nftables net-tools vim
 	echo 'kernel/mm/transparent_hugepage/enabled = madvise' >> /etc/sysfs.conf
 	systemctl restart sysfsconf
 	sed -i "s/dc_eximconfig_configtype='local'/dc_eximconfig_configtype='internet'/" /etc/exim4/update-exim4.conf.conf && dpkg-reconfigure --frontend noninteractive exim4-config

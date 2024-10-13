@@ -457,35 +457,38 @@ then
 	type=$(lsb_release -is|tr '[A-Z]' '[a-z]')
 	release=$(lsb_release -sc|tr '[A-Z]' '[a-z]')
 	mkdir -p /etc/apt/keyrings
-	curl -o /etc/apt/keyrings/mariadb-keyring.pgp 'https://mariadb.org/mariadb_release_signing_key.pgp'
-	echo "deb [signed-by=/etc/apt/keyrings/mariadb-keyring.pgp] https://mirror.docker.ru/mariadb/repo/11.4/$type $release main" > /etc/apt/sources.list.d/mariadb.list
+#	curl -o /etc/apt/keyrings/mariadb-keyring.pgp 'https://mariadb.org/mariadb_release_signing_key.pgp'
+#	echo "deb [signed-by=/etc/apt/keyrings/mariadb-keyring.pgp] https://mirror.docker.ru/mariadb/repo/11.4/$type $release main" > /etc/apt/sources.list.d/mariadb.list
 	wget -q -O - https://nginx.org/keys/nginx_signing.key | gpg --dearmor | tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null
 	gpg --dry-run --quiet --no-keyring --import --import-options import-show /usr/share/keyrings/nginx-archive-keyring.gpg
 	cat <<-EOF > /etc/apt/sources.list.d/nginx.list
 		deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://nginx.org/packages/${type}/ ${release} nginx
 	EOF
 	export DEBIAN_FRONTEND="noninteractive"
-	debconf-set-selections <<< "mariadb-server mysql-server/root_password password ${mypwd}"
-	debconf-set-selections <<< "mariadb-server mysql-server/root_password_again password ${mypwd}"
-	debconf-set-selections <<< 'exim4-config exim4/dc_eximconfig_configtype select internet site; mail is sent and received directly using SMTP'
-	echo -e "[client]\npassword=${mypwd}" > /root/.my.cnf
+#	debconf-set-selections <<< "mariadb-server mysql-server/root_password password ${mypwd}"
+#	debconf-set-selections <<< "mariadb-server mysql-server/root_password_again password ${mypwd}"
+#	debconf-set-selections <<< 'exim4-config exim4/dc_eximconfig_configtype select internet site; mail is sent and received directly using SMTP'
+#	echo -e "[client]\npassword=${mypwd}" > /root/.my.cnf
 
 #	wget -qO /etc/apt/trusted.gpg.d/php.gpg https://ftp.mpi-inf.mpg.de/mirrors/linux/mirror/deb.sury.org/repositories/php/apt.gpg
 #	echo "deb https://ftp.mpi-inf.mpg.de/mirrors/linux/mirror/deb.sury.org/repositories/php ${release} main" > /etc/apt/sources.list.d/php8.2.list
 	add-apt-repository ppa:ondrej/php	
  	apt update
 	apt install -y php8.2-opcache php8.2-mysqli php8.2-fpm php8.2-gd php8.2-curl php8.2-xml php8.2-mbstring php8.2-xml php8.2-zip php8.2-ldap \
-		mariadb-server mysql-common mariadb-client \
-		nginx catdoc xpdf poppler-utils exim4 exim4-config apache2 libapache2-mod-rpaf \
-		nodejs npm redis sysfsutils nftables net-tools vim
+#		mariadb-server mysql-common \
+  mariadb-client \
+		nginx catdoc xpdf poppler-utils \ 
+#  exim4 exim4-config apache2 libapache2-mod-rpaf \
+#		nodejs npm redis \
+  sysfsutils nftables net-tools vim
 	echo 'kernel/mm/transparent_hugepage/enabled = madvise' >> /etc/sysfs.conf
 	systemctl restart sysfsconf
-	sed -i "s/dc_eximconfig_configtype='local'/dc_eximconfig_configtype='internet'/" /etc/exim4/update-exim4.conf.conf && dpkg-reconfigure --frontend noninteractive exim4-config
+#	sed -i "s/dc_eximconfig_configtype='local'/dc_eximconfig_configtype='internet'/" /etc/exim4/update-exim4.conf.conf && dpkg-reconfigure --frontend noninteractive exim4-config
 	ip=$(wget -qO- "https://ipinfo.io/ip")
-	mariadb -e "create database bitrix;create user bitrix@localhost;grant all on bitrix.* to bitrix@localhost;set password for bitrix@localhost = PASSWORD('${mypwddb}')"
+#	mariadb -e "create database bitrix;create user bitrix@localhost;grant all on bitrix.* to bitrix@localhost;set password for bitrix@localhost = PASSWORD('${mypwddb}')"
 	nfTabl
-	dplRedis
-	dplPush
+#	dplRedis
+#	dplPush
 
   cd /var/www/html || exit
 	# wget -qO- http://rep.fvds.ru/cms/bitrixstable.tgz|tar -zxp

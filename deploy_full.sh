@@ -452,6 +452,7 @@ mkdir -p /var/www/html
 if echo $os|grep -Eo 'Ubuntu' >/dev/null
 then
 	apt update
+        timedatectl set-timezone Europe/Moscow
 	apt-get install -y software-properties-common apt-transport-https debconf-utils lsb-release gnupg gnupg2 debian-archive-keyring pwgen make build-essential wget curl
 	type=$(lsb_release -is|tr '[A-Z]' '[a-z]')
 	release=$(lsb_release -sc|tr '[A-Z]' '[a-z]')
@@ -475,7 +476,7 @@ then
  	apt update
 	apt install -y php8.2-opcache php8.2-mysqli php8.2-fpm php8.2-gd php8.2-curl php8.2-xml php8.2-mbstring \
 		mariadb-server mysql-common mariadb-client \
-		nginx catdoc exim4 exim4-config apache2 libapache2-mod-rpaf \
+		nginx catdoc xpdf poppler-utils exim4 exim4-config apache2 libapache2-mod-rpaf \
 		nodejs npm redis sysfsutils nftables
 	echo 'kernel/mm/transparent_hugepage/enabled = madvise' >> /etc/sysfs.conf
 	systemctl restart sysfsconf

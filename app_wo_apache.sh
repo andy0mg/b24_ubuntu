@@ -533,7 +533,7 @@ then
 	chmod 644 ${mycnf} ${phpini} ${phpfpmcnf} ${croncnf} ${phpini2}
 
 	systemctl restart cron php8.2-fpm nginx
-	systemctl enable cron php8.2-fpm nginx sysfsconf.service
+	systemctl enable cron php8.2-fpm nginx
 fi
 
 #ip=$(wget -qO- "https://ipinfo.io/ip")

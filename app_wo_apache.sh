@@ -28,17 +28,15 @@ os=`set -o pipefail && { cat /etc/centos-release || { source /etc/os-release && 
 
 if echo $os|grep -E '^Ubuntu' >/dev/null
 then
-	mycnf='/etc/mysql/conf.d/z9_bitrix.cnf'
 	phpini='/etc/php/8.2/fpm/conf.d/z9_bitrix.ini'
 	phpini2='/etc/php/8.2/cli/conf.d/z9_bitrix.ini'
 	phpfpmcnf='/etc/php/8.2/fpm/pool.d/www.conf'
 	croncnf='/etc/cron.d/bitrixagent'
-	rediscnf='/etc/redis/redis.conf'
 fi
 
 mypwd=$(echo $RANDOM|md5sum|head -c 15)
-mypwddb=$(echo $RANDOM|md5sum|head -c 15)
-cryptokey=$(echo $RANDOM|md5sum|cut -d' ' -f1)
+#mypwddb=$(echo $RANDOM|md5sum|head -c 15)
+#cryptokey=$(echo $RANDOM|md5sum|cut -d' ' -f1)
 
 dbconn() {
 	cat <<-EOF
@@ -484,7 +482,7 @@ then
 	echo 'kernel/mm/transparent_hugepage/enabled = madvise' >> /etc/sysfs.conf
 	systemctl restart sysfsconf
 #	sed -i "s/dc_eximconfig_configtype='local'/dc_eximconfig_configtype='internet'/" /etc/exim4/update-exim4.conf.conf && dpkg-reconfigure --frontend noninteractive exim4-config
-	ip=$(wget -qO- "https://ipinfo.io/ip")
+#	ip=$(wget -qO- "https://ipinfo.io/ip")
 #	mariadb -e "create database bitrix;create user bitrix@localhost;grant all on bitrix.* to bitrix@localhost;set password for bitrix@localhost = PASSWORD('${mypwddb}')"
 	nfTabl
 #	dplRedis
@@ -497,26 +495,26 @@ then
 	dbconn > bitrix/php_interface/dbconn.php
 	settings > bitrix/.settings.php
 
-	mv -f ./httpd/bx /etc/apache2/bx
-	a2dismod mpm_event
-	a2enmod mpm_worker
-	a2enmod remoteip
-	a2enmod rewrite
-	a2enmod proxy
-	a2enmod proxy_fcgi
-	ln -s /var/log/apache2 /etc/apache2/logs
-	echo 'Listen 127.0.0.1:8888' > /etc/apache2/ports.conf
-	apacheCnf >> /etc/apache2/apache2.conf
-	rm /etc/apache2/bx/conf/bx_apache_site_name_port.conf
+#	mv -f ./httpd/bx /etc/apache2/bx
+#	a2dismod mpm_event
+#	a2enmod mpm_worker
+#	a2enmod remoteip
+#	a2enmod rewrite
+#	a2enmod proxy
+#	a2enmod proxy_fcgi
+#	ln -s /var/log/apache2 /etc/apache2/logs
+#	echo 'Listen 127.0.0.1:8888' > /etc/apache2/ports.conf
+#	apacheCnf >> /etc/apache2/apache2.conf
+#	rm /etc/apache2/bx/conf/bx_apache_site_name_port.conf
 
 	mv -f ./nginx/* /etc/nginx/
-	rm -rf ./{httpd,nginx}
+#	rm -rf ./{httpd,nginx}
 
 	phpsetup >> ${phpini}
 	phpsetup >> ${phpini2}
 	fpmsetup 'www-data' > ${phpfpmcnf}
 	cronagent 'www-data' > ${croncnf}
-	mysqlcnf > ${mycnf}
+#	mysqlcnf > ${mycnf}
 	chown -R www-data:www-data /var/www/html
 	ln -s /var/lib/php/sessions /var/lib/php/session
 	ln -s /etc/nginx/bx/site_avaliable/push.conf /etc/nginx/bx/site_enabled/
@@ -524,22 +522,22 @@ then
 	envver=$(wget -qO- 'https://repos.1c-bitrix.ru/yum/SRPMS/' | grep -Eo 'bitrix-env-[0-9]\.[^src\.rpm]*'|sort -n|tail -n 1 | sed 's/bitrix-env-//;s/-/./')
 
 	echo "env[BITRIX_VA_VER]=${envver}" >> ${phpfpmcnf}
-	sed -i 's/general/crm/' /etc/apache2/bx/conf/00-environment.conf
-	sed -i "/BITRIX_VA_VER/d;\$a SetEnv BITRIX_VA_VER ${envver}" /etc/apache2/bx/conf/00-environment.conf
+#	sed -i 's/general/crm/' /etc/apache2/bx/conf/00-environment.conf
+#	sed -i "/BITRIX_VA_VER/d;\$a SetEnv BITRIX_VA_VER ${envver}" /etc/apache2/bx/conf/00-environment.conf
 	chmod 644 ${mycnf} ${phpini} ${phpfpmcnf} ${croncnf} ${phpini2}
 
 	sed -i 's|user apache|user www-data|' /etc/nginx/nginx.conf
-	rm /etc/apache2/sites-enabled/000-default.conf
+#	rm /etc/apache2/sites-enabled/000-default.conf
 
 
 	sed -i 's|collation-server=utf8_general_ci|collation-server=utf8mb4_general_ci|' /etc/mysql/conf.d/z9_bitrix.cnf
 	chmod 644 ${mycnf} ${phpini} ${phpfpmcnf} ${croncnf} ${phpini2}
 
-	systemctl restart cron mysql php8.2-fpm apache2 nginx php8.2-fpm redis-server push-server
-	systemctl enable cron mysql php8.2-fpm apache2 nginx php8.2-fpm push-server sysfsconf.service
+	systemctl restart cron php8.2-fpm nginx
+	systemctl enable cron php8.2-fpm nginx sysfsconf.service
 fi
 
-ip=$(wget -qO- "https://ipinfo.io/ip")
+#ip=$(wget -qO- "https://ipinfo.io/ip")
 echo 'gt smart' > /env
 curl -s "http://${ip}/"|grep 'bitrixsetup' >/dev/null || exit 1
 

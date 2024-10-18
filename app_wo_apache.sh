@@ -474,7 +474,7 @@ then
  	apt update
 	apt install -y php8.2-opcache php8.2-mysqli php8.2-fpm php8.2-gd php8.2-curl php8.2-xml php8.2-mbstring php8.2-xml php8.2-zip php8.2-ldap \
    	mariadb-client nginx catdoc xpdf poppler-utils \ 
-	sysfsutils nftables net-tools vim	
+	nftables net-tools vim	
 #		mariadb-server mysql-common \
 #  exim4 exim4-config apache2 libapache2-mod-rpaf \
 #		nodejs npm redis \
@@ -529,7 +529,7 @@ then
 #	rm /etc/apache2/sites-enabled/000-default.conf
 
 
-	sed -i 's|collation-server=utf8_general_ci|collation-server=utf8mb4_general_ci|' /etc/mysql/conf.d/z9_bitrix.cnf
+#	sed -i 's|collation-server=utf8_general_ci|collation-server=utf8mb4_general_ci|' /etc/mysql/conf.d/z9_bitrix.cnf
 	chmod 644 ${mycnf} ${phpini} ${phpfpmcnf} ${croncnf} ${phpini2}
 
 	systemctl restart cron php8.2-fpm nginx

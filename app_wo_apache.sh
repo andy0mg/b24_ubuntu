@@ -473,13 +473,13 @@ then
 	add-apt-repository ppa:ondrej/php	
  	apt update
 	apt install -y php8.2-opcache php8.2-mysqli php8.2-fpm php8.2-gd php8.2-curl php8.2-xml php8.2-mbstring php8.2-xml php8.2-zip php8.2-ldap \
-   	mariadb-client nginx catdoc xpdf poppler-utils \ 
-	nftables net-tools vim	
+   	mariadb-client nginx catdoc xpdf poppler-utils nftables net-tools vim 
+		
 #		mariadb-server mysql-common \
 #  exim4 exim4-config apache2 libapache2-mod-rpaf \
 #		nodejs npm redis \
-  	echo 'kernel/mm/transparent_hugepage/enabled = madvise' >> /etc/sysfs.conf
-	systemctl restart sysfsconf
+#  	echo 'kernel/mm/transparent_hugepage/enabled = madvise' >> /etc/sysfs.conf
+#	systemctl restart sysfsconf
 #	sed -i "s/dc_eximconfig_configtype='local'/dc_eximconfig_configtype='internet'/" /etc/exim4/update-exim4.conf.conf && dpkg-reconfigure --frontend noninteractive exim4-config
 #	ip=$(wget -qO- "https://ipinfo.io/ip")
 #	mariadb -e "create database bitrix;create user bitrix@localhost;grant all on bitrix.* to bitrix@localhost;set password for bitrix@localhost = PASSWORD('${mypwddb}')"

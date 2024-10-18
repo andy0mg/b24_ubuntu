@@ -10,7 +10,7 @@
 #
 
 # use
-# bash <(curl -sL https://raw.githubusercontent.com/andy0mg/b24_ubuntu/refs/heads/main/deploy_full.sh)
+# bash <(curl -sL https://raw.githubusercontent.com/andy0mg/b24_ubuntu/refs/heads/main/app_wo_apache.sh)
 
 cat > /root/run.sh <<\END
 

@@ -14,6 +14,8 @@ sed -i 's/Hostname=Zabbix server/#Hostname=Zabbix server/g' /etc/zabbix/zabbix_a
 sed -i 's/# HostnameItem=system.hostname/HostnameItem=system.hostname/g' /etc/zabbix/zabbix_agentd.conf
 sed -i 's/Server=127.0.0.1/Server=10.120.5.234/g' /etc/zabbix/zabbix_agentd.conf
 sed -i 's/ServerActive=127.0.0.1/ServerActive=10.120.5.234/g' /etc/zabbix/zabbix_agentd.conf
+
+nft add rule inet filter input iifname ens160 tcp dport 10050 counter accept
 systemctl restart zabbix-agent
 systemctl enable zabbix-agent
 

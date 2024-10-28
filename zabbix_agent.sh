@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 
-# bash <(curl -sL https://raw.githubusercontent.com/andy0mg/b24_ubuntu/refs/heads/main/mariadb.sh)
+# bash <(curl -sL https://raw.githubusercontent.com/andy0mg/b24_ubuntu/refs/heads/main/zabbix_agent.sh)
 
 cat > /root/run.sh <<\END
 

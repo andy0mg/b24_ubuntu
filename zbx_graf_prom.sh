@@ -24,6 +24,7 @@ tee < ${LOG_PIPE} ${LOG_FILE} &
 exec > ${LOG_PIPE}
 exec 2> ${LOG_PIPE}
 
+os=`set -o pipefail && { cat /etc/centos-release || { source /etc/os-release && echo $PRETTY_NAME; } ;}`
 
 prom_graf() {
 	cat <<-EOF
@@ -136,6 +137,8 @@ scrape_configs:
  	EOF
 }
 
+if echo $os|grep -Eo 'Ubuntu' >/dev/null
+then
 apt install apt-transport-https ca-certificates curl software-properties-common
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
@@ -150,5 +153,9 @@ prom_conf > ./prometheus/prometheus.yml
 systemctl start docker
 docker compose -f docker-compose_v3_ubuntu_mysql_latest.yaml up -d
 docker compose -f docker-compose_v3_prom_graf.yml up -d
+fi
+ip=$(wget -qO- "https://ipinfo.io/ip")
+
 END
+
 bash /root/run.sh

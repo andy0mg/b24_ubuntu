@@ -93,7 +93,7 @@ networks:
       driver: default
       config:
         - subnet: 172.28.0.0/16
-	EOF
+EOF
 }
 
 prom_conf() {

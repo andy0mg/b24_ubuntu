@@ -1,4 +1,4 @@
-	#!/bin/sh
+#!/bin/sh
 #
 # metadata_begin
 # recipe: zabbix_docker

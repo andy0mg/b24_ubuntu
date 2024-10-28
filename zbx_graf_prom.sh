@@ -93,7 +93,7 @@ networks:
       driver: default
       config:
         - subnet: 172.28.0.0/16
-	EOF
+		EOF
 }
 
 prom_conf() {
@@ -134,7 +134,7 @@ prom_conf() {
    		 static_configs:
     		- targets: ['192.168.1.1:9270', '192.168.1.2:9270']
     
- 			EOF
+			EOF
 		}
 
 if echo $os|grep -Eo 'Ubuntu' >/dev/null
@@ -156,6 +156,6 @@ docker compose -f docker-compose_v3_prom_graf.yml up -d
 fi
 ip=$(wget -qO- "https://ipinfo.io/ip")
 
-END
+	END
 
 bash /root/run.sh

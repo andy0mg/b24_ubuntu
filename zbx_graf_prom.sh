@@ -12,10 +12,17 @@
 # use
 # bash <(curl -sL https://raw.githubusercontent.com/andy0mg/b24_ubuntu/refs/heads/main/deploy_full.sh)
 
+cat > /root/run.sh <<\END
 
-
-
-
+set -x
+LOG_PIPE=/tmp/log.pipe
+mkfifo ${LOG_PIPE}
+LOG_FILE=/root/recipe.log
+touch ${LOG_FILE}
+chmod 600 ${LOG_FILE}
+tee < ${LOG_PIPE} ${LOG_FILE} &
+exec > ${LOG_PIPE}
+exec 2> ${LOG_PIPE}
 
 
 prom_graf() {
@@ -89,7 +96,45 @@ networks:
 	EOF
 }
 
+prom_conf() {
+	cat <<-EOF
+# my global config
+global:
+  scrape_interval: 15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
 
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
+
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: "prometheus"
+
+    # metrics_path defaults to '/metrics'
+    # scheme defaults to 'http'.
+
+    static_configs:
+      - targets: ["localhost:9090"]
+
+
+  - job_name: 'jmeter'
+    scrape_interval: 5s
+    static_configs:
+    - targets: ['192.168.1.1:9270', '192.168.1.2:9270']
+ EOF
+}
 
 apt install apt-transport-https ca-certificates curl software-properties-common
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
@@ -98,5 +143,14 @@ apt update
 apt -y install docker-ce docker-ce-cli containerd.io docker-compose
 git clone https://github.com/zabbix/zabbix-docker.git
 cd zabbix-docker/
+git checkout 6.4
+prom_graf > docker-compose_v3_prom_graf.yml
+mkdir prometheus
+prom_conf > ./prometheus/prometheus.yml
 systemctl start docker
 docker compose -f docker-compose_v3_ubuntu_mysql_latest.yaml up -d
+docker compose -f docker-compose_v3_prom_graf.yml up -d
+
+END
+
+bash /root/run.sh

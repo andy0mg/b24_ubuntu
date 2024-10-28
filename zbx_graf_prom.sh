@@ -92,7 +92,7 @@ networks:
       driver: default
       config:
         - subnet: 172.28.0.0/16
-EOF
+	EOF
 }
 
 prom_conf() {
@@ -132,7 +132,8 @@ scrape_configs:
     scrape_interval: 5s
     static_configs:
     - targets: ['192.168.1.1:9270', '192.168.1.2:9270']
- EOF
+    
+ 	EOF
 }
 
 apt install apt-transport-https ca-certificates curl software-properties-common

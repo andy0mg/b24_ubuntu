@@ -10,7 +10,7 @@
 #
 
 # use
-# bash <(curl -sL https://raw.githubusercontent.com/andy0mg/b24_ubuntu/refs/heads/main/deploy_full.sh)
+# bash <(curl -sL https://raw.githubusercontent.com/andy0mg/b24_ubuntu/refs/heads/main/zbx_graf_prom.sh)
 
 cat > /root/run.sh <<\END
 

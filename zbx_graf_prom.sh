@@ -27,8 +27,7 @@ exec 2> ${LOG_PIPE}
 
 prom_graf() {
 	cat <<-EOF
-		version: '3.9'
-
+version: '3.9'
 services:
 
   prometheus:

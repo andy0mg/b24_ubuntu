@@ -150,7 +150,5 @@ prom_conf > ./prometheus/prometheus.yml
 systemctl start docker
 docker compose -f docker-compose_v3_ubuntu_mysql_latest.yaml up -d
 docker compose -f docker-compose_v3_prom_graf.yml up -d
-
 END
-
 bash /root/run.sh

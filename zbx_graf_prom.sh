@@ -149,7 +149,7 @@ cd zabbix-docker/
 git checkout 6.4
 prom_graf > docker-compose_v3_prom_graf.yml
 mkdir prometheus
-prom_conf > ./prometheus/prometheus.yml
+#prom_conf > ./prometheus/prometheus.yml
 systemctl start docker
 docker compose -f docker-compose_v3_ubuntu_mysql_latest.yaml up -d
 docker compose -f docker-compose_v3_prom_graf.yml up -d

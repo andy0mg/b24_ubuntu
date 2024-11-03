@@ -19,4 +19,12 @@ net.ipv4.ip_local_port_range = 2000 65000
 EOF
 
 sysctl -p /etc/sysctl.d/99-jmeter.conf
-
+tee /tmp/prom_jmt.conf <<EOF
+prometheus.port = 9270
+prometheus.ip = 0.0.0.0
+#prometheus.delay = 0
+prometheus.save.threads = true
+prometheus.save.threads.name = jmeter_threads
+prometheus.save.jvm = true
+EOF
+cat /tmp/prom_jmt.conf >> /opt/jmeter/bin/jmeter.properties

@@ -28,3 +28,5 @@ prometheus.save.threads.name = jmeter_threads
 prometheus.save.jvm = true
 EOF
 cat /tmp/prom_jmt.conf >> /opt/jmeter/bin/jmeter.properties
+wget https://jmeter-plugins.org/get/ -O /opt/jmeter/lib/ext/jmeter-plugins-manager.jar
+apt install -y xauth xterm

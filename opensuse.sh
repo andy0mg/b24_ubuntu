@@ -10,7 +10,7 @@
 #
 
 # use
-# bash <(curl -sL https://raw.githubusercontent.com/YogSottot/bitrix-gt/master/bitrix24_gt.sh)
+# bash <(curl -sL https://raw.githubusercontent.com/andy0mg/b24_ubuntu/refs/heads/main/opensuse.sh)
 
 cat > /root/run.sh <<\END
 

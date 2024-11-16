@@ -2,7 +2,7 @@
 #
 # metadata_begin
 # recipe: Bitrix24 GT
-# tags: centos7,debian11,debian12
+# tags: opensuse
 # revision: 6
 # description_ru: Рецепт установки Bitrix24
 # description_en: Bitrix CMS installing recipe
@@ -26,15 +26,14 @@ exec 2> ${LOG_PIPE}
 
 os=`set -o pipefail && { cat /etc/centos-release || { source /etc/os-release && echo $PRETTY_NAME; } ;}`
 
-if echo $os|grep -E '^CentOS.* [7]{1}\.' >/dev/null
+if echo $os|grep -E '^openSUSE.* [7]{1}\.' >/dev/null
 then
 	nginxcnf='/etc/nginx/conf.d/default.conf'
 	mycnf='/etc/my.cnf.d/z9_bitrix.cnf'
 	phpini='/etc/php.d/z9_bitrix.ini'
 	phpfpmcnf='/etc/php-fpm.d/www.conf'
 	croncnf='/etc/cron.d/bitrixagent'
-	rediscnf='/etc/redis.conf'
-fi
+zyfi
 
 if echo $os|grep -E '^Debian' >/dev/null
 then
@@ -90,10 +89,10 @@ dplRedis(){
 		rediscnf > ${rediscnf}
 		echo 'vm.overcommit_memory = 1' >> /etc/sysctl.conf
 		sysctl vm.overcommit_memory=1
-	  usermod -g www-data redis
+	  usermod -g www redis
     chown redis:redis /etc/redis/ /var/log/redis/
     [[ ! -d /etc/systemd/system/redis.service.d ]] && mkdir /etc/systemd/system/redis.service.d
-    echo -e '[Service]\nGroup=www-data\nPIDFile=/run/redis/redis-server.pid' > /etc/systemd/system/redis.service.d/custom.conf
+    echo -e '[Service]\nGroup=www\nPIDFile=/run/redis/redis-server.pid' > /etc/systemd/system/redis.service.d/custom.conf
     systemctl daemon-reload
     systemctl stop redis
     systemctl enable --now redis || systemctl enable --now redis-server
@@ -382,10 +381,10 @@ dplPush(){
 	cp etc/sysconfig/push-server-multi  /etc/sysconfig/push-server-multi
 	cp etc/push-server/push-server.service  /etc/systemd/system/
 	ln -sf /opt/node_modules/push-server /opt/push-server
-	useradd -g www-data bitrix
+	useradd -g www bitrix
 
 	cat <<EOF >> /etc/sysconfig/push-server-multi
-GROUP=www-data
+GROUP=www
 SECURITY_KEY="${cryptokey}"
 RUN_DIR=/tmp/push-server
 REDIS_SOCK=/var/run/redis/redis.sock
@@ -393,12 +392,12 @@ WS_HOST=127.0.0.1
 EOF
 	/usr/local/bin/push-server-multi configs pub
 	/usr/local/bin/push-server-multi configs sub
-	echo 'd /tmp/push-server 0770 bitrix www-data -' > /etc/tmpfiles.d/push-server.conf
+	echo 'd /tmp/push-server 0770 bitrix www -' > /etc/tmpfiles.d/push-server.conf
 	systemd-tmpfiles --remove --create
 	[[ ! -d /var/log/push-server ]] && mkdir /var/log/push-server
-	chown bitrix:www-data /var/log/push-server
+	chown bitrix:www /var/log/push-server
 
-	sed -i 's|User=.*|User=bitrix|;s|Group=.*|Group=www-data|;s|ExecStart=.*|ExecStart=/usr/local/bin/push-server-multi systemd_start|;s|ExecStop=.*|ExecStop=/usr/local/bin/push-server-multi stop|' /etc/systemd/system/push-server.service
+	sed -i 's|User=.*|User=bitrix|;s|Group=.*|Group=www|;s|ExecStart=.*|ExecStart=/usr/local/bin/push-server-multi systemd_start|;s|ExecStop=.*|ExecStop=/usr/local/bin/push-server-multi stop|' /etc/systemd/system/push-server.service
 	systemctl daemon-reload
 	systemctl stop push-server
 	systemctl --now enable push-server
@@ -549,37 +548,34 @@ then
 fi
 
 
-if echo $os|grep -Eo 'Debian' >/dev/null
+if echo $os|grep -Eo 'openSUSE' >/dev/null
 then
-	apt update
-	apt-get install -y software-properties-common apt-transport-https debconf-utils lsb-release gnupg gnupg2 debian-archive-keyring pwgen make build-essential wget curl
-	type=$(lsb_release -is|tr '[A-Z]' '[a-z]')
-	release=$(lsb_release -sc|tr '[A-Z]' '[a-z]')
-	mkdir -p /etc/apt/keyrings
-	curl -o /etc/apt/keyrings/mariadb-keyring.pgp 'https://mariadb.org/mariadb_release_signing_key.pgp'
-	echo "deb [signed-by=/etc/apt/keyrings/mariadb-keyring.pgp] https://mirror.docker.ru/mariadb/repo/11.3/$type $release main" > /etc/apt/sources.list.d/mariadb.list
-	wget -q -O - https://nginx.org/keys/nginx_signing.key | gpg --dearmor | tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null
-	gpg --dry-run --quiet --no-keyring --import --import-options import-show /usr/share/keyrings/nginx-archive-keyring.gpg
-	cat <<-EOF > /etc/apt/sources.list.d/nginx.list
-		deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://nginx.org/packages/${type}/ ${release} nginx
-	EOF
-	export DEBIAN_FRONTEND="noninteractive"
-	debconf-set-selections <<< "mariadb-server mysql-server/root_password password ${mypwd}"
-	debconf-set-selections <<< "mariadb-server mysql-server/root_password_again password ${mypwd}"
-	debconf-set-selections <<< 'exim4-config exim4/dc_eximconfig_configtype select internet site; mail is sent and received directly using SMTP'
+
+zypper refresh
+zypper update
+
+zypper -n install apache2
+
+
+
+zypper -n install php81 php81-cli \
+    php81-ldap php81-opcache php81-zip php81-posix \
+    php81-zlib php81-openssl php81-mbstring \
+    php81-bz2 php81-curl php81-iconv \
+    php81-pear php81-pecl php81-devel php81-sockets  \
+    php81-gd apache2-mod_php81 php81-mysql php81-redis php81-fpm
+	
+zypper -n install nginx
+zypper -n install mariadb
+zypper -n install redis
+zypper -n install nodejs18
+ 
 	echo -e "[client]\npassword=${mypwd}" > /root/.my.cnf
 
-	wget -qO /etc/apt/trusted.gpg.d/php.gpg https://ftp.mpi-inf.mpg.de/mirrors/linux/mirror/deb.sury.org/repositories/php/apt.gpg
-	echo "deb https://ftp.mpi-inf.mpg.de/mirrors/linux/mirror/deb.sury.org/repositories/php ${release} main" > /etc/apt/sources.list.d/php8.2.list
-	apt update
-	apt install -y php8.2-opcache php8.2-mysqli php8.2-fpm php8.2-gd php8.2-curl php8.2-xml php8.2-mbstring \
-		mariadb-server mysql-common mariadb-client \
-		nginx catdoc exim4 exim4-config apache2 libapache2-mod-rpaf \
-		nodejs npm redis sysfsutils nftables
-	echo 'kernel/mm/transparent_hugepage/enabled = madvise' >> /etc/sysfs.conf
-	systemctl restart sysfsconf
+	
+ 
 	sed -i "s/dc_eximconfig_configtype='local'/dc_eximconfig_configtype='internet'/" /etc/exim4/update-exim4.conf.conf && dpkg-reconfigure --frontend noninteractive exim4-config
-	ip=$(wget -qO- "https://ipinfo.io/ip")
+#	ip=$(wget -qO- "https://ipinfo.io/ip")
 	mariadb -e "create database bitrix;create user bitrix@localhost;grant all on bitrix.* to bitrix@localhost;set password for bitrix@localhost = PASSWORD('${mypwddb}')"
 	nfTabl
 	dplRedis
@@ -609,10 +605,10 @@ then
 
 	phpsetup >> ${phpini}
 	phpsetup >> ${phpini2}
-	fpmsetup 'www-data' > ${phpfpmcnf}
-	cronagent 'www-data' > ${croncnf}
+	fpmsetup 'wwwrun' > ${phpfpmcnf}
+	cronagent 'wwwrun' > ${croncnf}
 	mysqlcnf > ${mycnf}
-	chown -R www-data:www-data /var/www/html
+	chown -R wwwrun:www /var/www/html
 	ln -s /var/lib/php/sessions /var/lib/php/session
 	ln -s /etc/nginx/bx/site_avaliable/push.conf /etc/nginx/bx/site_enabled/
 
@@ -623,15 +619,15 @@ then
 	sed -i "/BITRIX_VA_VER/d;\$a SetEnv BITRIX_VA_VER ${envver}" /etc/apache2/bx/conf/00-environment.conf
 	chmod 644 ${mycnf} ${phpini} ${phpfpmcnf} ${croncnf} ${phpini2}
 
-	sed -i 's|user apache|user www-data|' /etc/nginx/nginx.conf
+	sed -i 's|user apache|user wwwrun|' /etc/nginx/nginx.conf
 	rm /etc/apache2/sites-enabled/000-default.conf
 
 
 	sed -i 's|collation-server=utf8_general_ci|collation-server=utf8mb4_general_ci|' /etc/mysql/conf.d/z9_bitrix.cnf
 	chmod 644 ${mycnf} ${phpini} ${phpfpmcnf} ${croncnf} ${phpini2}
 
-	systemctl restart cron mysql php8.2-fpm apache2 nginx php8.2-fpm redis-server push-server
-	systemctl enable cron mysql php8.2-fpm apache2 nginx php8.2-fpm push-server sysfsconf.service
+	systemctl restart cron mysql php8.1-fpm apache2 nginx php8.1-fpm redis-server push-server
+	systemctl enable cron mysql php8.1-fpm apache2 nginx php8.1-fpm push-server sysfsconf.service
 fi
 
 ip=$(wget -qO- "https://ipinfo.io/ip")

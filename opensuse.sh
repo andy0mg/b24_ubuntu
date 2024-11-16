@@ -552,7 +552,7 @@ if echo $os|grep -Eo 'openSUSE' >/dev/null
 then
 
 zypper refresh
-zypper update
+zypper update -n
 
 zypper -n install apache2
 

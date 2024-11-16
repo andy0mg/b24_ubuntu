@@ -24,7 +24,7 @@ tee < ${LOG_PIPE} ${LOG_FILE} &
 exec > ${LOG_PIPE}
 exec 2> ${LOG_PIPE}
 
-os=`set -o pipefail && { cat /etc/centos-release || { source /etc/os-release && echo $PRETTY_NAME; } ;}`
+os=`set -o pipefail && { source /etc/os-release && echo $PRETTY_NAME; }`
 
 if echo $os|grep -E '^openSUSE.* [7]{1}\.' >/dev/null
 then

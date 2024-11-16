@@ -33,7 +33,7 @@ then
 	phpini='/etc/php.d/z9_bitrix.ini'
 	phpfpmcnf='/etc/php-fpm.d/www.conf'
 	croncnf='/etc/cron.d/bitrixagent'
-zyfi
+fi
 
 if echo $os|grep -E '^Debian' >/dev/null
 then

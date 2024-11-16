@@ -554,21 +554,21 @@ then
 zypper refresh
 zypper update
 
-zypper -n -y install apache2
+zypper -n install apache2
 
 
 
-zypper -n -y install php81 php81-cli \
+zypper -n install php81 php81-cli \
     php81-ldap php81-opcache php81-zip php81-posix \
     php81-zlib php81-openssl php81-mbstring \
     php81-bz2 php81-curl php81-iconv \
     php81-pear php81-pecl php81-devel php81-sockets  \
     php81-gd apache2-mod_php81 php81-mysql php81-redis php81-fpm
 	
-zypper -n -y install nginx
-zypper -n -y install mariadb
-zypper -n -y install redis
-zypper -n -y install nodejs18
+zypper -n install nginx
+zypper -n install mariadb
+zypper -n install redis
+zypper -n install nodejs18
  
 	echo -e "[client]\npassword=${mypwd}" > /root/.my.cnf
 

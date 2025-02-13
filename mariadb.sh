@@ -69,7 +69,7 @@ table inet filter {
 		ip6 nexthdr ipv6-icmp limit rate 4/second accept
 		ct state { established, related } accept comment "Accept traffic originated from us"
 		tcp dport 22 accept comment "ssh"
-		tcp dport { 3306 } accept comment "mysql"
+		tcp dport 3306 accept comment "mysql"
 	}
 	chain forward {
 		type filter hook forward priority 0;
@@ -100,7 +100,7 @@ then
 	apt update
 	apt install -y mariadb-server mysql-common mariadb-client \
 		nftables net-tools vim
-	mariadb -e "create database bitrix;create user bitrix@'%';grant all on bitrix.* to bitrix@'%';set password for bitrix@localhost = PASSWORD('${mypwddb}')"
+	mariadb -e "create database bitrix;create user bitrix@'%';grant all on bitrix.* to bitrix@'%';set password for bitrix@'%' = PASSWORD('${mypwddb}')"
 	nfTabl
 	mysqlcnf > ${mycnf}
 	chmod 644 ${mycnf}

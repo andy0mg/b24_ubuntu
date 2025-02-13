@@ -54,8 +54,8 @@ rediscnf() {
 		pidfile /var/run/redis_6379.pid
 		logfile /var/log/redis/redis.log
 		dir /var/lib/redis
-		bind 127.0.0.1
-		protected-mode yes
+		#bind 127.0.0.1
+		protected-mode no
 		port 6379
 		tcp-backlog 511
 		unixsocketperm 777

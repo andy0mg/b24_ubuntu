@@ -67,7 +67,7 @@ read_buffer_size = 16M
 read_rnd_buffer_size = 16M
 myisam_sort_buffer_size = 1M
 thread_cache_size = 32
-max_connections = 100
+max_connections = 50
 tmp_table_size = 128M
 max_heap_table_size = 128M
 group_concat_max_len = 1024
@@ -88,12 +88,11 @@ init_connect = 'SET NAMES utf8mb4 COLLATE utf8mb4_general_ci'
 
 # InnoDB settings.
 innodb_dedicated_server = ON
-innodb_file_per_table = 1
-innodb_buffer_pool_size = 3072M
-
+#innodb_buffer_pool_size = 3072M
+#innodb_redo_log_capacity = 768M
 innodb_buffer_pool_instances = 3
+innodb_file_per_table = 1
 
-innodb_redo_log_capacity = 768M
 innodb_log_buffer_size = 64M
 innodb_flush_log_at_trx_commit = 2
 innodb_flush_method = O_DIRECT

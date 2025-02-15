@@ -47,7 +47,7 @@ mysqlcnf(){
 		transaction-isolation = READ-COMMITTED
 		performance_schema = OFF
 		sql_mode = ""
-		character-set-server=utf8
+		character-set-server=utf8mb4
 		collation-server=utf8_general_ci
 		init-connect="SET NAMES utf8"
 		explicit_defaults_for_timestamp = 1

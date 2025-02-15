@@ -27,30 +27,89 @@ mypwddb=$(echo $RANDOM|md5sum|head -c 15)
 
 mysqlcnf(){
 	cat <<-EOF
-		[mysqld]
-		innodb_buffer_pool_size = 384M
-		innodb_buffer_pool_instances = 1
-		innodb_flush_log_at_trx_commit = 2
-		innodb_flush_method = O_DIRECT
-		innodb_strict_mode = OFF
-		query_cache_type = 1
-		query_cache_size=16M
-		query_cache_limit=4M
-		key_buffer_size=256M
-		join_buffer_size=2M
-		sort_buffer_size=4M
-		tmp_table_size=128M
-		max_heap_table_size=128M
-		thread_cache_size = 4
-		table_open_cache = 2048
-		max_allowed_packet = 128M
-		transaction-isolation = READ-COMMITTED
-		performance_schema = OFF
-		sql_mode = ""
-		character-set-server=utf8mb4
-		collation-server=utf8_general_ci
-		init-connect="SET NAMES utf8"
-		explicit_defaults_for_timestamp = 1
+		[client]
+port = 3306
+socket = /run/mysqld/mysqld.sock
+default-character-set = utf8mb4
+
+[mysqld]
+port = 3306
+bind-address = 0.0.0.0
+#mysqlx_bind_address = 127.0.0.1
+datadir = /var/lib/mysql
+socket = /run/mysqld/mysqld.sock
+pid-file = /run/mysqld/mysqld.pid
+skip-name-resolve
+sql_mode = ""
+
+# Logging configuration.
+log-error = /var/log/mysql/mysql.log
+
+# Disable binlog to save disk space
+#disable-log-bin
+
+
+# Disabling symbolic-links is recommended to prevent assorted security risks
+
+# User is ignored when systemd is used (fedora >= 15).
+user = mysql
+
+# http://dev.mysql.com/doc/refman/5.5/en/performance-schema.html
+performance_schema = OFF
+
+# Memory settings.
+key_buffer_size = 8M
+max_allowed_packet = 16M
+table_open_cache = 4096
+sort_buffer_size = 14M
+join_buffer_size = 14M
+read_buffer_size = 16M
+read_rnd_buffer_size = 16M
+myisam_sort_buffer_size = 1M
+thread_cache_size = 32
+max_connections = 100
+tmp_table_size = 128M
+max_heap_table_size = 128M
+group_concat_max_len = 1024
+
+# Other settings.
+lower_case_table_names = 0
+transaction_isolation = READ-COMMITTED
+log_timestamps = SYSTEM
+event_scheduler = OFF
+low_priority_updates
+
+# collations
+character_set_server = utf8mb4
+collation_server = utf8mb4_general_ci
+init_connect = 'SET NAMES utf8mb4 COLLATE utf8mb4_general_ci'
+
+# thread handling
+
+# InnoDB settings.
+innodb_dedicated_server = ON
+innodb_file_per_table = 1
+innodb_buffer_pool_size = 3072M
+
+innodb_buffer_pool_instances = 3
+
+innodb_redo_log_capacity = 768M
+innodb_log_buffer_size = 64M
+innodb_flush_log_at_trx_commit = 2
+innodb_flush_method = O_DIRECT
+innodb_lock_wait_timeout = 50
+innodb_strict_mode = OFF
+
+# Disable Percona Telemetry
+percona_telemetry_disable = 1
+
+[mysqldump]
+quick
+quote-names
+max_allowed_packet = 256M
+
+[mysqld_safe]
+pid-file = /run/mysqld/mysqld.pid
 	EOF
 }
 

@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # use
-# bash <(curl -sL https://raw.githubusercontent.com/andy0mg/b24_ubuntu/refs/heads/main/deploy_full.sh)
+# bash <(curl -sL https://raw.githubusercontent.com/andy0mg/b24_ubuntu/refs/heads/main/all_cron.sh)
 echo "== Пользовательские crontab =="
 for user in $(cut -f1 -d: /etc/passwd); do
   echo "--- $user ---"

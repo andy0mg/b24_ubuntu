@@ -41,7 +41,7 @@ socket = /run/mysqld/mysqld.sock
 pid-file = /run/mysqld/mysqld.pid
 skip-name-resolve
 sql_mode = ""
-performance_schema=ON
+
 # Logging configuration.
 log-error = /var/log/mysql/mysql.log
 
@@ -55,11 +55,11 @@ log-error = /var/log/mysql/mysql.log
 user = mysql
 
 # http://dev.mysql.com/doc/refman/5.5/en/performance-schema.html
-performance_schema = OFF
+performance_schema = ON
 
 # Memory settings.
 key_buffer_size = 8M
-max_allowed_packet = 16M
+max_allowed_packet = 256M
 table_open_cache = 4096
 sort_buffer_size = 14M
 join_buffer_size = 14M
@@ -68,8 +68,8 @@ read_rnd_buffer_size = 16M
 myisam_sort_buffer_size = 1M
 thread_cache_size = 32
 max_connections = 50
-tmp_table_size = 128M
-max_heap_table_size = 128M
+tmp_table_size = 256M
+max_heap_table_size = 256M
 group_concat_max_len = 1024
 
 # Other settings.
@@ -90,7 +90,7 @@ init_connect = 'SET NAMES utf8mb4 COLLATE utf8mb4_general_ci'
 innodb_dedicated_server = ON
 #innodb_buffer_pool_size = 3072M
 #innodb_redo_log_capacity = 768M
-innodb_buffer_pool_instances = 3
+#innodb_buffer_pool_instances = 3
 innodb_file_per_table = 1
 
 innodb_log_buffer_size = 64M

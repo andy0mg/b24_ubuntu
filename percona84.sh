@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 
-# bash <(curl -sL https://raw.githubusercontent.com/andy0mg/b24_ubuntu/refs/heads/main/percona8.sh)
+# bash <(curl -sL https://raw.githubusercontent.com/andy0mg/b24_ubuntu/refs/heads/main/percona84.sh)
 
 cat > /root/run.sh <<\END
 

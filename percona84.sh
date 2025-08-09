@@ -41,7 +41,7 @@ socket = /run/mysqld/mysqld.sock
 pid-file = /run/mysqld/mysqld.pid
 skip-name-resolve
 sql_mode = ""
-
+performance_schema=ON
 # Logging configuration.
 log-error = /var/log/mysql/mysql.log
 

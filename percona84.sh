@@ -30,7 +30,6 @@ mysqlcnf(){
 		[client]
 port = 3306
 socket = /run/mysqld/mysqld.sock
-default-character-set = utf8mb4
 
 [mysqld]
 port = 3306

@@ -54,8 +54,8 @@ rediscnf() {
 		pidfile /var/run/redis_6379.pid
 		logfile /var/log/redis/redis.log
 		dir /var/lib/redis
-		#bind 127.0.0.1
-		protected-mode no
+		bind 127.0.0.1
+		protected-mode yes
 		port 6379
 		tcp-backlog 511
 		unixsocketperm 777
@@ -115,7 +115,7 @@ rediscnf() {
 
 dplPush(){
 	cd /opt
-	wget -q https://repo.bitrix.info/vm/push-server-0.4.0.tgz
+	#wget -q https://repo.bitrix.info/vm/push-server-0.4.0.tgz
 	npm install --production ./push-server-0.4.0.tgz
 	rm ./push-server-0.4.0.tgz
 	ln -sf /opt/node_modules/push-server/etc/push-server /etc/push-server
@@ -164,8 +164,7 @@ table inet filter {
 		ip6 nexthdr ipv6-icmp limit rate 4/second accept
 		ct state { established, related } accept comment "Accept traffic originated from us"
 		tcp dport 22 accept comment "ssh"
-		tcp dport { 6379 } accept comment "redis"
-    tcp dport { 8010,8011,8012,8013,8014,8015,9010,9011 } accept comment "push"
+		tcp dport { 8010,8011,8012,8013,8014,8015,9010,9011 } accept comment "push"
 	}
 	chain forward {
 		type filter hook forward priority 0;

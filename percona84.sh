@@ -162,7 +162,7 @@ then
   apt install -y percona-server-server percona-toolkit  sysbench
 	apt update
 	apt install -y nftables net-tools vim perl
-  wget https://raw.githubusercontent.com/major/MySQLTuner-perl/master/mysqltuner.pl
+  wget https://raw.githubusercontent.com/major/MySQLTuner-perl/master/mysqltuner.pl || apt install -y mysqltuner
 	mysql -e "create database bitrix;create user bitrix@'%' IDENTIFIED BY '${mypwddb}';grant all on bitrix.* to bitrix@'%';"
 	nfTabl
 	mysqlcnf > ${mycnf}
